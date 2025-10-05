@@ -1,0 +1,84 @@
+services:
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ticketingdb
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./../db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./../db/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+
+  kafka:
+    image: apache/kafka:4.1.0
+    container_name: kafka
+    environment:
+      KAFKA_KRAFT_MODE: "true"
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  passenger-service:
+    build: ./passenger-service
+    container_name: passenger-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql-db
+      - kafka
+
+  transport-service:
+    build: ./transport-service
+    container_name: transport-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql-db
+      - kafka
+
+  ticketing-service:
+    build: ./ticketing-service
+    container_name: ticketing-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql-db
+      - kafka
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mysql-db
+      - kafka
+
+  notification-service:
+    build: ./notific-service
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysql-db
+      - kafka
+
+  admin-service:
+    build: ./admin-service
+    container_name: admin-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql-db
+      - kafka
+
+volumes:
+  kafka-data:
