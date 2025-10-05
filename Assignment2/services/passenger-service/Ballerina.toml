@@ -1,0 +1,12 @@
+[package]
+org = "transport_system"
+name = "passenger_service"
+version = "1.0.0"
+distribution = "2201.8.5"
+
+[build-options]
+observabilityIncluded = true
+
+[tool.bal]
+observability.enabled = true
+observability.provider = "jaeger"

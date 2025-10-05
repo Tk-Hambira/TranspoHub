@@ -1,0 +1,51 @@
+# Common configuration template for all microservices
+# Copy this file to each service directory and customize as needed
+
+[database]
+url = "${MONGODB_URL}"
+name = "service_db"
+connectionTimeout = 30
+maxPoolSize = 10
+
+[kafka]
+bootstrapServers = "${KAFKA_BOOTSTRAP_SERVERS}"
+groupId = "service-group"
+autoOffsetReset = "earliest"
+enableAutoCommit = true
+sessionTimeoutMs = 30000
+maxPollRecords = 500
+
+[redis]
+url = "${REDIS_URL}"
+connectionTimeout = 5000
+commandTimeout = 3000
+maxConnections = 10
+
+[service]
+host = "0.0.0.0"
+port = "${SERVICE_PORT}"
+cors.allowOrigins = ["*"]
+cors.allowMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+cors.allowHeaders = ["Content-Type", "Authorization"]
+
+[security]
+jwtSecret = "${JWT_SECRET}"
+jwtExpiryTime = 3600
+refreshTokenExpiryTime = 86400
+bcryptRounds = 12
+
+[logging]
+level = "INFO"
+format = "json"
+includeLocation = true
+
+[monitoring]
+metricsEnabled = true
+tracingEnabled = true
+healthCheckPath = "/health"
+
+[resilience]
+circuitBreakerEnabled = true
+retryMaxAttempts = 3
+retryDelayMs = 1000
+timeoutMs = 30000
